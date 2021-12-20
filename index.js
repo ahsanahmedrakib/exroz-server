@@ -72,6 +72,26 @@ async function run() {
       res.send(result);
     });
 
+
+     // delete a single order
+  app.delete("/orders/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await ordersCollection.deleteOne(query);
+    res.json(result);
+  });
+
+ // get a users own order
+ app.get("/myorders", async (req, res) => {
+  const email = req.query.email;
+  const query = { email: email };
+  const cursor = ordersCollection.find(query);
+  const result = await cursor.toArray();
+  res.json(result);
+});
+
+
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user);
