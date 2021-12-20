@@ -21,11 +21,55 @@ async function run() {
     const database = client.db("exroz");
     const servicesCollection = database.collection("services");
     const usersCollection = database.collection("users");
+    const pricingCollection = database.collection("pricing");
+    const ordersCollection = database.collection("orders");
+
+    app.get("/services", async (req, res) => {
+      const services = servicesCollection.find({});
+      const result = await services.toArray();
+      res.send(result);
+    });
 
     app.post("/services", async (req, res) => {
       const services = req.body;
       const result = await servicesCollection.insertOne(services);
       res.json(result);
+    });
+
+    //pricing
+    app.get("/pricing", async (req, res) => {
+      const pricing = pricingCollection.find({});
+      const result = await pricing.toArray();
+      res.send(result);
+    });
+
+    app.post("/pricing", async (req, res) => {
+      const pricing = req.body;
+      const result = await pricingCollection.insertOne(pricing);
+      console.log(result);
+      res.json(result);
+    });
+
+    // get a single pricing to purchase
+    app.get("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const pricing = await pricingCollection.findOne(query);
+      res.send(pricing);
+    });
+
+    app.post("/orders", async (req, res) => {
+      const orders = req.body;
+      const result = await ordersCollection.insertOne(orders);
+      console.log(result);
+      res.json(result);
+    });
+
+     //orders
+     app.get("/orders", async (req, res) => {
+      const orders = ordersCollection.find({});
+      const result = await orders.toArray();
+      res.send(result);
     });
 
     app.post("/users", async (req, res) => {
@@ -38,8 +82,8 @@ async function run() {
       const user = req.body;
       const filter = { email: user.email };
       const updatedoc = { $set: { role: "admin" } };
-      const result = await usersCollection.updateOne(filter, updatedoc)
-      res.json(result)
+      const result = await usersCollection.updateOne(filter, updatedoc);
+      res.json(result);
     });
 
     //check if a user is admin or not
